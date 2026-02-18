@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SlideForge</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0B0F1C;
+      --bg-elevated: #131929;
+      --bg-glass: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.08);
+      --border-active: rgba(0,153,216,0.5);
+      --brand: #0099D8;
+      --brand-glow: rgba(0,153,216,0.2);
+      --accent: #F5C200;
+      --text-primary: rgba(255,255,255,0.92);
+      --text-secondary: rgba(255,255,255,0.48);
+      --text-muted: rgba(255,255,255,0.24);
+      --success: #22C55E;
+      --error: #EF4444;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --dur: 250ms;
+    }
+
+    /* Respect reduced-motion preference */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    html, body {
+      width: 420px; height: 580px; overflow: hidden;
+      background: var(--bg); color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 13px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+    }
+
+    /* Focus visible — keyboard-only ring */
+    :focus-visible {
+      outline: 2px solid var(--brand);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    :focus:not(:focus-visible) { outline: none; }
+
+    .app { display: flex; flex-direction: column; height: 100%; }
+
+    /* ── Header ── */
+    .header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 16px 20px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .logo {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, var(--brand) 0%, #005F8C 100%);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo svg { width: 16px; height: 16px; }
+    .header-title { flex: 1; }
+    .header-title h1 { font-size: 14px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.01em; }
+    .header-title p { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+    .version-badge {
+      font-size: 10px; font-weight: 600; color: var(--brand);
+      background: var(--brand-glow); padding: 2px 7px; border-radius: 20px;
+      border: 1px solid rgba(0,153,216,0.3);
+    }
+
+    /* ── Content ── */
+    .content { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+    .content::-webkit-scrollbar { width: 4px; }
+    .content::-webkit-scrollbar-track { background: transparent; }
+    .content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .section-label { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+
+    /* ── JSON textarea ── */
+    .json-area {
+      width: 100%; height: 180px; background: var(--bg-glass); border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--text-primary);
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; font-size: 11px; line-height: 1.6;
+      padding: 12px; resize: none; outline: none; transition: border-color var(--dur) var(--ease);
+    }
+    .json-area:focus { border-color: var(--border-active); box-shadow: 0 0 0 3px var(--brand-glow); }
+    .json-area::placeholder { color: var(--text-muted); }
+    .json-area-hint { font-size: 10px; color: var(--text-muted); margin-top: 5px; }
+
+    /* ── Options ── */
+    .options-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .option-card {
+      background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;
+      transition: border-color var(--dur) var(--ease);
+    }
+    .option-card:hover { border-color: rgba(255,255,255,0.14); }
+    .option-card:focus-within { border-color: var(--border-active); }
+    .option-label { font-size: 10px; color: var(--text-secondary); font-weight: 500; }
+    .option-select, .option-input {
+      background: transparent; border: none; color: var(--text-primary);
+      font-size: 12px; font-weight: 500; outline: none; width: 100%; cursor: pointer;
+    }
+    .option-select option { background: #1a2235; }
+
+    /* ── Progress ── */
+    .progress-section { display: none; flex-direction: column; gap: 8px; }
+    .progress-section.visible { display: flex; }
+    .progress-header { display: flex; align-items: center; justify-content: space-between; }
+    .progress-label { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+    .progress-count { font-size: 11px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+    .progress-bar-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .progress-bar-fill {
+      height: 100%; background: linear-gradient(90deg, var(--brand), #00C6FF);
+      border-radius: 2px; width: 0%; transition: width 300ms var(--ease);
+    }
+    .progress-message { font-size: 11px; color: var(--text-secondary); }
+
+    /* ── Status banner ── */
+    .status-banner { display: none; align-items: center; gap: 8px; padding: 10px 12px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; }
+    .status-banner.success { display: flex; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25); color: var(--success); }
+    .status-banner.error { display: flex; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: var(--error); }
+    .status-icon { width: 16px; height: 16px; flex-shrink: 0; }
+
+    /* ── Footer ── */
+    .footer { padding: 12px 20px 16px; display: flex; gap: 8px; border-top: 1px solid var(--border); flex-shrink: 0; }
+
+    .btn {
+      flex: 1; height: 38px; border-radius: var(--radius-sm); border: none;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all var(--dur) var(--ease); position: relative; overflow: hidden;
+    }
+    .btn::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0); transition: background 200ms; }
+    .btn:hover::after { background: rgba(255,255,255,0.06); }
+    .btn:active::after { background: rgba(255,255,255,0.12); }
+    .btn-primary { background: linear-gradient(135deg, var(--brand) 0%, #0077A8 100%); color: white; flex: 2; }
+    .btn-primary:hover { box-shadow: 0 4px 20px var(--brand-glow); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-primary:disabled::after { display: none; }
+    .btn-ghost { background: var(--bg-glass); border: 1px solid var(--border); color: var(--text-secondary); }
+    .btn-ghost:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.16); }
+
+    .btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 2px; background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 3px; }
+    .tab {
+      flex: 1; height: 28px; border: none; background: transparent; color: var(--text-secondary);
+      font-size: 12px; font-weight: 500; cursor: pointer; border-radius: 5px;
+      transition: all 200ms var(--ease);
+    }
+    .tab:hover { color: var(--text-primary); }
+    .tab.active { background: rgba(255,255,255,0.08); color: var(--text-primary); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Templates ── */
+    .template-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .template-card {
+      background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 10px; cursor: pointer; transition: all 200ms var(--ease); text-align: left;
+    }
+    .template-card:hover { border-color: var(--border-active); background: rgba(0,153,216,0.05); }
+    .template-card.selected { border-color: var(--brand); background: var(--brand-glow); }
+    .template-thumb {
+      width: 100%; aspect-ratio: 16/9; border-radius: 5px; margin-bottom: 6px;
+      background: linear-gradient(135deg, #131929, #1a2235);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .template-thumb svg { width: 24px; height: 24px; opacity: 0.4; }
+    .template-name { font-size: 11px; font-weight: 600; color: var(--text-primary); }
+    .template-desc { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 4h12v1H2zM2 7.5h12v1H2zM2 11h12v1H2z" fill="white"/>
+        <path d="M10 2l4 6-4 6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+    <div class="header-title">
+      <h1>SlideForge</h1>
+      <p>JSON → Figma Slides with motion</p>
+    </div>
+    <span class="version-badge" aria-label="Version 1.0">v1.0</span>
+  </div>
+
+  <!-- Content -->
+  <div class="content" role="main">
+
+    <!-- Tabs -->
+    <div class="tabs" role="tablist" aria-label="Input method">
+      <button class="tab active" data-tab="json" role="tab" aria-selected="true" aria-controls="tab-json">JSON Spec</button>
+      <button class="tab" data-tab="templates" role="tab" aria-selected="false" aria-controls="tab-templates">Templates</button>
+    </div>
+
+    <!-- Tab: JSON -->
+    <div class="tab-panel active" id="tab-json" role="tabpanel">
+      <label class="section-label" for="json-input">Deck Specification</label>
+      <textarea class="json-area" id="json-input" placeholder='{"name":"My Deck","slides":[]}' aria-describedby="json-hint" spellcheck="false"></textarea>
+      <div class="json-area-hint" id="json-hint">Paste your DeckSpec JSON — processed in chunks of 5 slides</div>
+      <div class="options-row" style="margin-top:4px;">
+        <div class="option-card">
+          <label class="option-label" for="transition-type">Transition</label>
+          <select class="option-select" id="transition-type">
+            <option value="SMART_ANIMATE">Smart Animate</option>
+            <option value="DISSOLVE">Dissolve</option>
+            <option value="PUSH">Push</option>
+            <option value="SLIDE_IN">Slide In</option>
+            <option value="MOVE_IN">Move In</option>
+          </select>
+        </div>
+        <div class="option-card">
+          <label class="option-label" for="duration">Duration (ms)</label>
+          <input class="option-input" id="duration" type="number" value="450" min="100" max="2000" step="50" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Templates -->
+    <div class="tab-panel" id="tab-templates" role="tabpanel" hidden>
+      <div class="section-label">Premium Templates</div>
+      <div class="template-grid" id="template-grid" role="radiogroup" aria-label="Select a template"></div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-section" id="progress-section" aria-live="polite">
+      <div class="progress-header">
+        <span class="progress-label" id="progress-label">Building slides…</span>
+        <span class="progress-count" id="progress-count"></span>
+      </div>
+      <div class="progress-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-track">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+      <div class="progress-message" id="progress-message"></div>
+    </div>
+
+    <!-- Status -->
+    <div class="status-banner" id="status-banner" role="alert" aria-live="assertive">
+      <span class="status-icon" id="status-icon"></span>
+      <span id="status-text"></span>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <button class="btn btn-ghost" id="btn-clear" aria-label="Clear all slide frames">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Clear
+    </button>
+    <button class="btn btn-primary" id="btn-generate">
+      <span id="btn-generate-label">Generate Slides</span>
+    </button>
+  </div>
+
+</div>
+<script src="ui.js"></script>
+</body>
+</html>
