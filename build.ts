@@ -3,13 +3,13 @@ import * as fs from 'fs'
 
 const watch = process.argv.includes('--watch')
 
-// Build plugin code (runs in Figma sandbox)
+// Build plugin code (runs in Figma sandbox — jsvm, no optional chaining)
 const codeConfig: esbuild.BuildOptions = {
   entryPoints: ['src/code/index.ts'],
   bundle: true,
   outfile: 'dist/code.js',
   platform: 'browser',
-  target: 'es2020',
+  target: 'es2017',
   format: 'iife',
   minify: !watch,
   sourcemap: watch ? 'inline' : false,
