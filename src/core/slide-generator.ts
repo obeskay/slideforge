@@ -5,6 +5,7 @@
  */
 import type { DeckSpec, SlideSpec } from '../types/slide-spec'
 import { buildNode, setTokens } from './node-builder'
+import { buildPaint } from './paint-builder'
 import { applyTransitions, applySequentialTransitions, EASING_PRESETS } from './transitions'
 import { loadAllFonts } from '../utils/fonts'
 
@@ -49,10 +50,12 @@ async function buildSlide(
 
   // Apply background
   if (spec.background) {
-    frame.fills = [spec.background] as readonly Paint[]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    frame.fills = [buildPaint(spec.background)] as unknown as any
   } else {
     // Default: dark navy
-    frame.fills = [{ type: 'SOLID', color: { r: 0.043, g: 0.059, b: 0.110 } }]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    frame.fills = [{ type: 'SOLID', color: { r: 0.043, g: 0.059, b: 0.110 }, opacity: 1 }] as unknown as any
   }
 
   // Build child nodes

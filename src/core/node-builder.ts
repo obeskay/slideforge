@@ -10,7 +10,7 @@ import type {
   CornerRadius, Paint,
   DesignTokens
 } from '../types/slide-spec'
-import { applyFills, applyStrokes, applyEffects, applyBlend } from './paint-builder'
+import { applyFills, applyStrokes, applyEffects, applyBlend, buildPaints } from './paint-builder'
 
 // ─── Token Resolution ─────────────────────────────────────────────────────────
 
@@ -140,7 +140,7 @@ async function buildTextNode(spec: TextNodeSpec, parent: ChildrenMixin): Promise
   if (s.textAlignHorizontal) node.textAlignHorizontal = s.textAlignHorizontal
   if (s.textAlignVertical) node.textAlignVertical = s.textAlignVertical
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (s.fills) node.fills = s.fills as unknown as any
+  if (s.fills) node.fills = buildPaints(s.fills) as unknown as any
   if (s.truncation) node.textTruncation = s.truncation
   if (s.maxLines !== undefined) node.maxLines = s.maxLines
   if (spec.autoResize) node.textAutoResize = spec.autoResize
@@ -157,7 +157,7 @@ async function buildTextNode(spec: TextNodeSpec, parent: ChildrenMixin): Promise
         }
         if (segStyle.fontSize) node.setRangeFontSize(seg.start, seg.end, segStyle.fontSize)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if (segStyle.fills) node.setRangeFills(seg.start, seg.end, segStyle.fills as unknown as any)
+        if (segStyle.fills) node.setRangeFills(seg.start, seg.end, buildPaints(segStyle.fills) as unknown as any)
         if (segStyle.textCase) node.setRangeTextCase(seg.start, seg.end, segStyle.textCase)
         if (segStyle.textDecoration) node.setRangeTextDecoration(seg.start, seg.end, segStyle.textDecoration)
         if (segStyle.letterSpacing) node.setRangeLetterSpacing(seg.start, seg.end, segStyle.letterSpacing)
