@@ -12,7 +12,7 @@
     "esbuild": "^0.25.0",
     "typescript": "^5.4.0",
     "ts-node": "^10.9.2",
-    "@types/node": "^22.0.0"
+    "@types/node": "^26.1.2"
   },
   "keywords": ["figma", "plugin", "slides", "motionGraphics", "smartAnimate"],
   "license": "MIT"
