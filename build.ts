@@ -28,11 +28,11 @@ const uiConfig: esbuild.BuildOptions = {
   format: 'iife',
   minify: !watch,
   sourcemap: watch ? 'inline' : false,
+  // Inline after every build, watch rebuilds included, so dist/ui.html (the manifest's "ui") stays current
+  plugins: [{ name: 'inline-ui', setup: (b) => b.onEnd((r) => { if (!r.errors.length) inlineUI() }) }],
 }
 
-async function buildUI(): Promise<void> {
-  await esbuild.build(uiConfig)
-
+function inlineUI(): void {
   // Read the UI HTML template and inline the bundle
   const htmlTemplate = fs.readFileSync('src/ui/index.html', 'utf-8')
   const jsBundle = fs.readFileSync('dist/ui-bundle.js', 'utf-8')
@@ -53,7 +53,7 @@ async function build(): Promise<void> {
 
   await Promise.all([
     esbuild.build(codeConfig).then(() => console.log('✅ Plugin code built → dist/code.js')),
-    buildUI()
+    esbuild.build(uiConfig)
   ])
 
   console.log('🚀 SlideForge plugin built successfully!')
@@ -64,6 +64,8 @@ async function main(): Promise<void> {
     const codeCtx = await esbuild.context(codeConfig)
     const uiCtx = await esbuild.context(uiConfig)
     await Promise.all([codeCtx.watch(), uiCtx.watch()])
+    // esbuild only watches the JS graph; the HTML template is inlined, so rebuild when it changes too
+    fs.watch('src/ui', (_, file) => { if (file === 'index.html') uiCtx.rebuild().catch(() => {}) })
     console.log('👀 Watching for changes...')
   } else {
     await build()
