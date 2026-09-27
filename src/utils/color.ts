@@ -15,30 +15,6 @@ export function toFigmaRGB(color: RGBA): RGB & { a?: number } {
   return { r: color.r, g: color.g, b: color.b }
 }
 
-/** Preset brand colors */
-export const COLORS = {
-  // WOOW / Coppel brand
-  BRAND_BLUE: hexToRGBA('#0099D8'),
-  BRAND_YELLOW: hexToRGBA('#F5C200'),
-  DARK_BG: hexToRGBA('#0B0F1C'),
-  SUCCESS_GREEN: hexToRGBA('#22C55E'),
-  WHITE: hexToRGBA('#FFFFFF'),
-  BLACK: hexToRGBA('#000000'),
-  TRANSPARENT: hexToRGBA('#000000', 0),
-
-  // Walmart
-  WALMART_BLUE: hexToRGBA('#0071CE'),
-  WALMART_YELLOW: hexToRGBA('#FFC220'),
-
-  // Neutrals
-  GRAY_100: hexToRGBA('#F5F5F5'),
-  GRAY_200: hexToRGBA('#E5E7EB'),
-  GRAY_400: hexToRGBA('#9CA3AF'),
-  GRAY_600: hexToRGBA('#4B5563'),
-  GRAY_800: hexToRGBA('#1F2937'),
-  GRAY_900: hexToRGBA('#111827'),
-} as const
-
 /** Interpolate between two colors */
 export function lerpColor(a: RGBA, b: RGBA, t: number): RGBA {
   return {
