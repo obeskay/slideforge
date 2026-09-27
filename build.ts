@@ -40,7 +40,7 @@ function inlineUI(): void {
   // Replace the <script src="ui.js"></script> tag with inlined JS
   const finalHtml = htmlTemplate.replace(
     '<script src="ui.js"></script>',
-    `<script>${jsBundle}</script>`
+    () => `<script>${jsBundle}</script>` // a function: a string would expand $& and $' found in the bundle
   )
 
   if (!fs.existsSync('dist')) fs.mkdirSync('dist', { recursive: true })
