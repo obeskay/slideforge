@@ -32,6 +32,8 @@ npm install
 
 ### 2. Build
 
+Needs Node 22.18 or newer, which runs `build.ts` with its built-in TypeScript support.
+
 ```bash
 npm run build
 ```

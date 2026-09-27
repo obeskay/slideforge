@@ -3,17 +3,17 @@
   "version": "1.0.0",
   "description": "SlideForge — Generate premium Figma Slides from JSON spec with SmartAnimate & motion graphics",
   "scripts": {
-    "build": "npx ts-node build.ts",
-    "watch": "npx ts-node build.ts --watch",
-    "typecheck": "tsc --noEmit"
+    "build": "node build.ts",
+    "watch": "node build.ts --watch",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p src/ui"
   },
   "devDependencies": {
     "@figma/plugin-typings": "^1.139.0",
     "esbuild": "^0.28.2",
-    "typescript": "^5.4.0",
-    "ts-node": "^10.9.2",
+    "typescript": "^7.0.2",
     "@types/node": "^22.0.0"
   },
   "keywords": ["figma", "plugin", "slides", "motionGraphics", "smartAnimate"],
-  "license": "MIT"
+  "license": "MIT",
+  "engines": { "node": ">=22.18" }
 }

@@ -1,0 +1,9 @@
+{
+  // The UI runs in an iframe with a DOM; the plugin code runs in Figma's sandbox,
+  // which has none, so only this half gets the DOM lib. Together they also keep
+  // TS 7's DOM Navigation interface away from Figma's global Navigation type.
+  "extends": "../../tsconfig.json",
+  "compilerOptions": { "lib": ["ES2020", "DOM"], "rootDir": ".." },
+  "include": ["*.ts", "../types/*.ts"],
+  "exclude": []
+}
