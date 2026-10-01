@@ -11,7 +11,7 @@
     "@figma/plugin-typings": "^1.139.0",
     "esbuild": "^0.28.2",
     "typescript": "^7.0.2",
-    "@types/node": "^22.0.0"
+    "@types/node": "^25.9.8"
   },
   "keywords": ["figma", "plugin", "slides", "motionGraphics", "smartAnimate"],
   "license": "MIT",
