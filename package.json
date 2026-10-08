@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p src/ui"
   },
   "devDependencies": {
-    "@figma/plugin-typings": "^1.139.0",
+    "@figma/plugin-typings": "^1.140.0",
     "esbuild": "^0.28.2",
     "typescript": "^7.0.2",
     "@types/node": "^22.0.0"
