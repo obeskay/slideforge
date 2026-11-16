@@ -1,7 +1,7 @@
 {
   "name": "slideforge-figma-plugin",
   "version": "1.0.0",
-  "description": "SlideForge — Generate premium Figma Slides from JSON spec with SmartAnimate & motion graphics",
+  "description": "SlideForge — Build Figma Slides from a JSON spec, with SmartAnimate transitions",
   "scripts": {
     "build": "node build.ts",
     "watch": "node build.ts --watch",

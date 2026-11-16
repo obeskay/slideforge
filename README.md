@@ -2,13 +2,19 @@
 
 **JSON to Figma Slides with SmartAnimate & motion graphics.**
 
-A Figma plugin that converts structured JSON deck specifications into fully built Figma Slide frames, complete with transitions, easing presets, and chunked processing for large decks.
+<p align="center">
+  <img src="docs/media/panel.gif" width="420" alt="SlideForge panel: picking the Stats template fills the JSON spec, then the transition and duration are set before Generate Slides" />
+  <br />
+  <sub>The plugin panel, recorded from the built <code>dist/ui.html</code> in a browser. The slides themselves are built inside Figma, which this clip does not show.</sub>
+</p>
+
+A Figma plugin that converts structured JSON deck specifications into fully built Figma Slide frames, complete with transitions, per-transition easing, and chunked processing for large decks.
 
 ## Features
 
 - **JSON-driven slide generation** — Define slides, layers, text, shapes, and vectors via a typed DeckSpec schema
 - **SmartAnimate transitions** — Automatic transition wiring between slides with matched layer names
-- **Rich easing presets** — Material Expressive (450ms ease-in-out default), Spring, Bounce, Gentle, Snap, custom cubic-bezier
+- **Easing per transition** — Figma's built-in curves, a spring with your own mass, stiffness and damping, or a custom cubic-bezier. Listed transitions default to ease-in-out, 0.3 s; a deck with none is chained slide to slide at 450 ms
 - **Chunked processing** — Batches of 5 slides to prevent memory saturation on large decks
 - **Full Figma node support** — Frame, Text, Rectangle, Ellipse, Line, Star, Polygon, Vector, Group
 - **Auto Layout** — Full auto-layout spec support (mode, alignment, padding, spacing, wrap)
@@ -17,8 +23,7 @@ A Figma plugin that converts structured JSON deck specifications into fully buil
 - **Mixed text segments** — Per-range font, size, color, decoration, hyperlinks
 - **Design tokens** — Token resolution for colors and typography
 - **4 built-in templates** — Hero Dark, Stats, Split Layout, CTA
-- **Accessible UI** — WCAG compliant: ARIA roles, keyboard navigation, `prefers-reduced-motion`, focus-visible rings
-- **Premium dark glassmorphism UI** — No emojis, SVG icons throughout
+- **Keyboard-friendly panel** — ARIA tabs and radio group, arrow keys to move between templates, Enter or Space to pick one, focus-visible rings, `prefers-reduced-motion` respected
 
 ## Quick Start
 
@@ -51,7 +56,7 @@ This generates `dist/code.js` and `dist/ui.html`.
 
 - **JSON tab**: Paste a DeckSpec JSON and hit **Generate Slides**
 - **Templates tab**: Pick a preset template (Hero Dark, Stats, Split, CTA)
-- Configure transition type and duration before generating
+- The panel's **Transition** and **Duration** fields set the slide-to-slide chain when the spec lists no `transitions`; listed transitions keep their own values
 
 ## DeckSpec Schema
 
@@ -93,7 +98,7 @@ slideforge/
     types/
       slide-spec.ts      # Full TypeScript schema
     ui/
-      index.html         # Plugin UI (dark glassmorphism)
+      index.html         # Plugin panel markup and styles
       index.ts           # UI logic (tabs, templates, progress)
     utils/
       color.ts           # Color utilities
@@ -112,6 +117,9 @@ npm run watch
 # Type checking only
 npm run typecheck
 
+# Check that the panel's Transition and Duration reach the generated deck
+npm run check
+
 # Production build
 npm run build
 ```
@@ -126,17 +134,19 @@ npm run build
 | `SLIDE_IN` | New slide enters from edge |
 | `MOVE_IN` | New slide moves over current |
 | `MOVE_OUT` | Current slide moves away |
+| `SLIDE_OUT` | Current slide leaves toward an edge |
+| `SCROLL_ANIMATE` | Scroll-style transition between frames |
 
-## Easing Presets
+## Easing
 
-| Preset | Curve | Duration |
-|--------|-------|----------|
-| `STANDARD` | `cubic-bezier(0.4, 0, 0.2, 1)` | 450ms |
-| `EMPHASIZED` | `cubic-bezier(0.2, 0, 0, 1)` | 500ms |
-| `SPRING` | mass=1, stiffness=100, damping=15 | - |
-| `BOUNCE` | mass=1, stiffness=200, damping=12 | - |
-| `GENTLE` | mass=1, stiffness=80, damping=20 | - |
-| `SNAP` | mass=1, stiffness=300, damping=25 | - |
+Set `easing.type` on a transition. Without one, the transition uses `EASE_IN_AND_OUT`.
+
+| `easing.type` | Extra fields | Result |
+|---------------|--------------|--------|
+| `LINEAR`, `EASE_IN`, `EASE_OUT`, `EASE_IN_AND_OUT` | — | Figma's standard curves |
+| `EASE_IN_BACK`, `EASE_OUT_BACK`, `EASE_IN_AND_OUT_BACK` | — | The same curves with a slight overshoot |
+| `SPRING`, `CUSTOM_SPRING` | `spring: { mass, stiffness, damping }` | Custom spring; defaults 1 / 100 / 10 |
+| `CUSTOM_BEZIER` | `bezier: { x1, y1, x2, y2 }` | Custom cubic-bezier; default 0.4, 0, 0.2, 1 |
 
 ## Tech Stack
 
