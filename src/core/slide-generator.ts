@@ -6,7 +6,7 @@
 import type { DeckSpec, SlideSpec } from '../types/slide-spec'
 import { buildNode, setTokens } from './node-builder'
 import { buildPaint } from './paint-builder'
-import { applyTransitions, applySequentialTransitions, EASING_PRESETS } from './transitions'
+import { applyTransitions, applySequentialTransitions, autoChainDefaults } from './transitions'
 import { loadAllFonts } from '../utils/fonts'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -17,9 +17,6 @@ const DEFAULT_HEIGHT = 1080
 
 /** Chunk size for large decks — prevents memory saturation */
 const SLIDE_CHUNK_SIZE = 5
-
-/** Material Expressive 2026 default duration in seconds */
-const DEFAULT_DURATION = 0.45
 
 // ─── Progress Reporter ─────────────────────────────────────────────────────────
 
@@ -177,12 +174,9 @@ export async function generateDeck(
   if (spec.transitions && spec.transitions.length > 0) {
     transitionCount = await applyTransitions(spec.transitions, allFrameMap)
   } else {
-    // Auto-chain with Material Expressive defaults (ease-in-out 450ms)
-    transitionCount = await applySequentialTransitions(allFrames, {
-      type: 'SMART_ANIMATE',
-      easing: EASING_PRESETS.STANDARD,
-      duration: DEFAULT_DURATION,
-    })
+    // Auto-chain slides in order, using the panel's Transition and Duration fields.
+    const ui = (spec as DeckSpec & { _uiOverrides?: { duration?: number; transitionType?: string } })._uiOverrides
+    transitionCount = await applySequentialTransitions(allFrames, autoChainDefaults(ui))
   }
 
   onProgress?.({

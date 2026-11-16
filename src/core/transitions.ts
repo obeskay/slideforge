@@ -201,6 +201,21 @@ export async function applySequentialTransitions(
 }
 
 /**
+ * Deck-wide default when a spec lists no transitions: the panel's Transition
+ * and Duration fields when they hold usable values (capped at 2 s), else SMART_ANIMATE, 450 ms.
+ */
+export function autoChainDefaults(
+  ui?: { duration?: number; transitionType?: string }
+): Partial<SlideTransition> {
+  const d = ui?.duration
+  return {
+    type: (ui?.transitionType as TransitionType | undefined) ?? 'SMART_ANIMATE',
+    easing: EASING_PRESETS.STANDARD,
+    duration: d !== undefined && Number.isFinite(d) && d > 0 ? Math.min(d, 2) : 0.45, // panel field allows 100–2000 ms
+  }
+}
+
+/**
  * Pre-built easing presets for motion graphics
  */
 export const EASING_PRESETS = {

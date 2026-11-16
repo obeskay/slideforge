@@ -5,7 +5,8 @@
   "scripts": {
     "build": "node build.ts",
     "watch": "node build.ts --watch",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p src/ui"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p src/ui",
+    "check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-auto-chain.mts"
   },
   "devDependencies": {
     "@figma/plugin-typings": "^1.139.0",
