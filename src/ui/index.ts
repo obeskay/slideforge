@@ -147,6 +147,7 @@ const statusBanner = document.getElementById('status-banner') as HTMLElement
 const statusIcon = document.getElementById('status-icon') as HTMLElement
 const statusText = document.getElementById('status-text') as HTMLElement
 const templateGrid = document.getElementById('template-grid') as HTMLElement
+const progressTrack = document.getElementById('progress-track') as HTMLElement
 
 // ─── Tabs ─────────────────────────────────────────────────────────────────────
 
@@ -185,15 +186,32 @@ function renderTemplates(): void {
       templateGrid.querySelectorAll('.template-card').forEach((c) => {
         c.classList.remove('selected')
         c.setAttribute('aria-checked', 'false')
+        ;(c as HTMLElement).tabIndex = -1
       })
       card.classList.add('selected')
       card.setAttribute('aria-checked', 'true')
+      ;(card as HTMLElement).tabIndex = 0
       const id = (card as HTMLElement).dataset.id!
       const template = TEMPLATES.find((t) => t.id === id)
       if (template) {
         jsonInput.value = JSON.stringify(template.spec, null, 2)
         document.querySelector('[data-tab="json"]')!.dispatchEvent(new Event('click'))
       }
+    })
+  })
+
+  // Radio-group keys: Enter/Space picks, arrows move focus (roving tabindex).
+  const cards = [...templateGrid.querySelectorAll<HTMLElement>('.template-card')]
+  cards.forEach((card, i) => {
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); return }
+      const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key]
+      if (!step || e.altKey || e.metaKey || e.ctrlKey) return
+      e.preventDefault()
+      const next = cards[(i + step + cards.length) % cards.length]
+      cards.forEach((c) => { c.tabIndex = -1 })
+      next.tabIndex = 0
+      next.focus()
     })
   })
 }
@@ -206,7 +224,9 @@ function showProgress(label: string, current: number, total: number, message: st
   progressSection.classList.add('visible')
   progressLabel.textContent = label
   progressCount.textContent = total > 0 ? `${current} / ${total}` : ''
-  progressBar.style.width = total > 0 ? `${Math.round((current / total) * 100)}%` : '0%'
+  const pct = total > 0 ? Math.round((current / total) * 100) : 0
+  progressBar.style.width = `${pct}%`
+  progressTrack.setAttribute('aria-valuenow', String(pct))
   progressMessage.textContent = message
 }
 
@@ -214,11 +234,14 @@ function hideProgress(): void {
   progressSection.classList.remove('visible')
 }
 
+let statusTimer: ReturnType<typeof setTimeout> | undefined
+
 function showStatus(type: 'success' | 'error', text: string): void {
   statusBanner.className = `status-banner ${type}`
   statusIcon.innerHTML = type === 'success' ? STATUS_ICONS.success : STATUS_ICONS.error
   statusText.textContent = text
-  setTimeout(() => { statusBanner.className = 'status-banner' }, 6000)
+  clearTimeout(statusTimer)
+  statusTimer = setTimeout(() => { statusBanner.className = 'status-banner' }, 6000)
 }
 
 function setGenerating(generating: boolean): void {

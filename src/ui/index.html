@@ -141,9 +141,9 @@
     .btn:hover::after { background: rgba(255,255,255,0.06); }
     .btn:active::after { background: rgba(255,255,255,0.12); }
     .btn-primary { background: linear-gradient(135deg, var(--brand) 0%, #0077A8 100%); color: white; flex: 2; }
-    .btn-primary:hover { box-shadow: 0 4px 20px var(--brand-glow); transform: translateY(-1px); }
-    .btn-primary:active { transform: translateY(0); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-primary:hover { transform: translateY(-1px); }
+    .btn:active, .template-card:active { transform: scale(0.98); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
     .btn-primary:disabled::after { display: none; }
     .btn-ghost { background: var(--bg-glass); border: 1px solid var(--border); color: var(--text-secondary); }
     .btn-ghost:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.16); }
@@ -236,7 +236,7 @@
 
     <!-- Tab: Templates -->
     <div class="tab-panel" id="tab-templates" role="tabpanel" hidden>
-      <div class="section-label">Premium Templates</div>
+      <div class="section-label">Templates</div>
       <div class="template-grid" id="template-grid" role="radiogroup" aria-label="Select a template"></div>
     </div>
 
