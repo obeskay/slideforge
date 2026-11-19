@@ -9,7 +9,7 @@
     "check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-auto-chain.mts"
   },
   "devDependencies": {
-    "@figma/plugin-typings": "^1.139.0",
+    "@figma/plugin-typings": "^1.142.0",
     "esbuild": "^0.28.2",
     "typescript": "^7.0.2",
     "@types/node": "^22.0.0"
